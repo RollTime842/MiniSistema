@@ -1,7 +1,6 @@
 import inquirer from "inquirer";
 import chalk from "chalk";
 import Doctor from "../models/Doctor.js";
-import Paciente from "../models/Paciente.js";
 import Helper from "../helpers/helper.js";
 
 export default class DoctorController {
@@ -23,7 +22,6 @@ export default class DoctorController {
   constructor(opcion) {
     this.opcion = opcion;
     this.doctor = new Doctor();
-    this.carrera = new Carrera();
   }
 
   async validarMenu(opcion) {

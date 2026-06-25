@@ -4,6 +4,7 @@ import Paciente from "../models/Paciente.js";
 import Vacuna from "../models/Vacuna.js";
 import Helper from "../helpers/helper.js";
 
+
 export default class PacienteController {
   opcion = 0;
   opciones = [
@@ -12,11 +13,11 @@ export default class PacienteController {
       value: 0,
     },
     {
-      name: "Mostrar Estudiantes",
+      name: "Mostrar Pacientes",
       value: 1,
     },
     {
-      name: "Crear Estudiante",
+      name: "Crear Paciente",
       value: 2,
     },
   ];
@@ -40,6 +41,13 @@ export default class PacienteController {
 
   async create() {
     const vacunas = await this.vacuna.load();
+
+    if (vacunas.length === 0) {
+      console.log(chalk.bgRed.white("No hay vacunas registradas. Cree una vacuna primero."));
+      console.log();
+      await Helper.esperar();
+      return;
+    }
 
     let payload = await inquirer.prompt([
       {
@@ -164,7 +172,7 @@ export default class PacienteController {
     await Helper.esperar();
   }
 
-  async validate(nombre, apellido) {
+  async validatePaciente(nombre, apellido) {
     const pacientes = await this.paciente.load();
     const paciente = pacientes.find(
       (paciente) =>

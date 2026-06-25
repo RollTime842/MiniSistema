@@ -1,7 +1,6 @@
 import inquirer from "inquirer";
 import chalk from "chalk";
 import Vacuna from "../models/Vacuna.js";
-import Carrera from "../models/carrera.js";
 import Helper from "../helpers/helper.js";
 
 export default class VacunaController {
@@ -23,7 +22,6 @@ export default class VacunaController {
   constructor(opcion) {
     this.opcion = opcion;
     this.vacuna = new Vacuna();
-    this.carrera = new Carrera();
   }
 
   async validarMenu(opcion) {
