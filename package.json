@@ -9,5 +9,17 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RollTime842/MiniSistema.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RollTime842/MiniSistema/issues"
+  },
+  "homepage": "https://github.com/RollTime842/MiniSistema#readme",
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "inquirer": "^14.0.2"
+  }
 }
