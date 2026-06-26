@@ -94,12 +94,38 @@ export default class DoctorController {
           }
           return true;
         },
+      },
+      {
+        type: "input",
+        name: "especialidad",
+        message: "Ingrese la especialidad del doctor",
+        validate: (input) => {
+          if (input.trim() === "") {
+            return "La especialidad del doctor no puede estar vacía.";
+          }
+          return true;
+        },
+      },
+      {
+        type: "input",
+        name: "telefono",
+        message: "Ingrese el teléfono del doctor",
+        validate: (input) => {
+          if (input.trim() === "") {
+            return "El teléfono del doctor no puede estar vacío.";
+          }
+          return true;
+        },
       }
     ]);
 
     const existe = await this.validateDoctor(
       payload.nombre,
       payload.apellido,
+      payload.edad,
+      payload.sexo,
+      payload.telefono,
+      payload.especialidad,
     );
 
     if (existe) {
@@ -121,6 +147,8 @@ export default class DoctorController {
       apellido: payload.apellido,
       edad: payload.edad,
       sexo: payload.sexo,
+      telefono: payload.telefono,
+      especialidad: payload.especialidad,
     });
     console.log(chalk.bgGreen.white("Doctor creado exitosamente"));
     await Helper.esperar();
@@ -136,6 +164,8 @@ export default class DoctorController {
         apellido: doctor.apellido,
         edad: doctor.edad,
         sexo: doctor.sexo,
+        telefono: doctor.telefono,
+        especialidad: doctor.especialidad,
       };
     });
     console.table(rows);
@@ -143,14 +173,22 @@ export default class DoctorController {
     await Helper.esperar();
   }
 
-  async validateDoctor(nombre, apellido) {
+  async validateDoctor(nombre, apellido, edad, sexo) {
     const doctores = await this.doctor.load();
     const doctor = doctores.find(
       (doctor) =>
         doctor.nombre.toLowerCase().trim() ===
           nombre.toLowerCase().trim() &&
         doctor.apellido.toLowerCase().trim() ===
-          apellido.toLowerCase().trim(),
+          apellido.toLowerCase().trim() &&
+        doctor.edad.toLowerCase().trim() ===
+          edad.toLowerCase().trim() &&
+        doctor.sexo.toLowerCase().trim() ===
+          sexo.toLowerCase().trim()&&
+        doctor.especialidad.toLowerCase().trim() ===
+          especialidad.toLowerCase().trim() &&
+        doctor.telefono.toLowerCase().trim() ===
+          telefono.toLowerCase().trim()
     );
     return doctor;
   }

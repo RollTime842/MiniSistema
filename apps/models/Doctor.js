@@ -1,16 +1,11 @@
-import Model from "./model.js";
-import Persona from "./Persona.js";
+import Model from "./Model.js"; 
+import Persona from "./persona.js";
 
 export default class Doctor extends Model {
   table = "doctores";
 
-  constructor(nombre, apellido, especialidad, telefono) {
-    super();
-
-    Object.assign(this, new Persona(nombre, apellido));
-
-    this.id = Date.now();
+  constructor(nombre, apellido,edad,sexo,telefono,especialidad) {
+    super(nombre, apellido,edad,sexo , telefono);
     this.especialidad = especialidad;
-    this.telefono = telefono;
   }
 }

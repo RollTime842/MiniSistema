@@ -1,0 +1,15 @@
+[
+  {
+    "table": "pacientes",
+    "id": 1782489903804,
+    "nombre": "ygfd",
+    "apellido": "kjhg",
+    "edad": "77",
+    "sexo": "M",
+    "vacuna": {
+      "table": "vacunas",
+      "id": 1782488827160,
+      "nombre": "tt"
+    }
+  }
+]

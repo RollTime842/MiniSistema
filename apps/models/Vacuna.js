@@ -1,4 +1,4 @@
-import Model from "./model.js";
+import Model from "./Model.js";
 
 export default class Vacuna extends Model {
   table = "vacunas";
