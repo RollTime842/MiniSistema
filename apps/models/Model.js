@@ -29,4 +29,12 @@ export default class Model {
       return [];
     }
   }
+    // NUEVO AGREGADO - Guarda array completo (sobrescribe)
+  async saveAll(datos) {
+    await fs.writeFile(
+      `db/${this.getTable()}.json`,
+      JSON.stringify(datos, null, 2)
+    );
+    return datos;
+  }
 }

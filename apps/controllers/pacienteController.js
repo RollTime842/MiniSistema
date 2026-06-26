@@ -19,6 +19,17 @@ export default class PacienteController {
     {
       name: "Crear Paciente",
       value: 2,
+      
+    },
+    // NUEVO AGREGADO
+    {
+      name: "Actualizar Paciente",
+      value: 3,
+    },
+    // NUEVO AGREGADO
+    {
+      name: "Eliminar Paciente",
+      value: 4,
     },
   ];
   constructor(opcion) {
@@ -34,6 +45,12 @@ export default class PacienteController {
       await this.read();
     } else if (opcion == 2) {
       await this.create();
+       // NUEVO AGREGADO
+    } else if (opcion == 3) {
+      await this.update();
+    // NUEVO AGREGADO
+    } else if (opcion == 4) {
+      await this.delete();
     } else {
       console.log(chalk.bgRed.white("Opción no válida"));
     }
@@ -169,6 +186,61 @@ export default class PacienteController {
     });
     console.table(rows);
     console.log();
+    await Helper.esperar();
+  }
+  
+  // NUEVO AGREGADO
+  async update() {
+    const pacientes = await this.paciente.load();
+    const vacunas = await this.vacuna.load();
+    if (!pacientes.length) {
+      console.log(chalk.bgRed.white("No hay pacientes."));
+      await Helper.esperar();
+      return;
+    }
+    if (!vacunas.length) {
+      console.log(chalk.bgRed.white("No hay vacunas. Cree una primero."));
+      await Helper.esperar();
+      return;
+    }
+    const { idx } = await inquirer.prompt([{
+      type: "select", name: "idx", message: "Seleccione paciente a actualizar",
+      choices: pacientes.map((p, i) => ({ name: `${p.nombre} ${p.apellido}`, value: i })),
+    }]);
+    const p = pacientes[idx];
+    const cambios = await inquirer.prompt([
+      { type: "input", name: "nombre", message: "Nombre", default: p.nombre, validate: v => v.trim() ? true : "Req" },
+      { type: "input", name: "apellido", message: "Apellido", default: p.apellido, validate: v => v.trim() ? true : "Req" },
+      { type: "input", name: "edad", message: "Edad", default: p.edad, validate: v => { const n = parseInt(v); return isNaN(n)||n<=0 ? "Número positivo" : true; } },
+      { type: "select", name: "sexo", message: "Sexo", default: p.sexo, choices: [{name:"Masculino",value:"M"},{name:"Femenino",value:"F"}] },
+      { type: "select", name: "vacuna", message: "Vacuna", choices: vacunas.map(v => ({ name: v.nombre, value: v })) },
+    ]);
+    pacientes[idx] = { ...p, ...cambios };
+    await this.paciente.saveAll(pacientes);
+    console.log(chalk.bgGreen.white("Paciente actualizado exitosamente"));
+    await Helper.esperar();
+  }
+
+  // NUEVO AGREGADO
+  async delete() {
+    const pacientes = await this.paciente.load();
+    if (!pacientes.length) {
+      console.log(chalk.bgRed.white("No hay pacientes."));
+      await Helper.esperar();
+      return;
+    }
+    const { idx } = await inquirer.prompt([{
+      type: "select", name: "idx", message: "Seleccione paciente a eliminar",
+      choices: pacientes.map((p, i) => ({ name: `${p.nombre} ${p.apellido}`, value: i })),
+    }]);
+    const { ok } = await inquirer.prompt([{ type: "confirm", name: "ok", message: `¿Eliminar a ${pacientes[idx].nombre} ${pacientes[idx].apellido}?`, default: false }]);
+    if (ok) {
+      pacientes.splice(idx, 1);
+      await this.paciente.saveAll(pacientes);
+      console.log(chalk.bgGreen.white("Paciente eliminado exitosamente"));
+    } else {
+      console.log(chalk.bgYellow.white("Operación cancelada"));
+    }
     await Helper.esperar();
   }
 

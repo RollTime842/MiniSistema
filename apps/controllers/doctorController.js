@@ -18,6 +18,17 @@ export default class DoctorController {
       name: "Crear Doctor",
       value: 2,
     },
+      {
+      name: "Actualizar Doctor",
+      value: 3,
+    },
+    // NUEVO AGREGADO
+    {
+      name: "Eliminar Doctor",
+      value: 4,
+    },
+
+    
   ];
   constructor(opcion) {
     this.opcion = opcion;
@@ -31,6 +42,12 @@ export default class DoctorController {
       await this.read();
     } else if (opcion == 2) {
       await this.create();
+      // NUEVO AGREGADO
+    } else if (opcion == 3) {
+      await this.update();
+    // NUEVO AGREGADO
+    } else if (opcion == 4) {
+      await this.delete();
     } else {
       console.log(chalk.bgRed.white("Opción no válida"));
     }
@@ -172,6 +189,56 @@ export default class DoctorController {
     console.log();
     await Helper.esperar();
   }
+  // NUEVO AGREGADO
+  async update() {
+    const doctores = await this.doctor.load();
+    if (!doctores.length) {
+      console.log(chalk.bgRed.white("No hay doctores registrados."));
+      await Helper.esperar();
+      return;
+    }
+    const { idx } = await inquirer.prompt([{
+      type: "select", name: "idx", message: "Seleccione doctor a actualizar",
+      choices: doctores.map((d, i) => ({ name: `${d.nombre} ${d.apellido} - ${d.especialidad}`, value: i })),
+    }]);
+    const d = doctores[idx];
+    const cambios = await inquirer.prompt([
+      { type: "input", name: "nombre", message: "Nombre", default: d.nombre, validate: v => v.trim() ? true : "Req" },
+      { type: "input", name: "apellido", message: "Apellido", default: d.apellido, validate: v => v.trim() ? true : "Req" },
+      { type: "input", name: "edad", message: "Edad", default: d.edad, validate: v => { const n = parseInt(v); return isNaN(n)||n<=0 ? "Número positivo" : true; } },
+      { type: "select", name: "sexo", message: "Sexo", default: d.sexo, choices: [{name:"Masculino",value:"M"},{name:"Femenino",value:"F"}] },
+      { type: "input", name: "telefono", message: "Teléfono", default: d.telefono, validate: v => v.trim() ? true : "Req" },
+      { type: "input", name: "especialidad", message: "Especialidad", default: d.especialidad, validate: v => v.trim() ? true : "Req" },
+    ]);
+    doctores[idx] = { ...d, ...cambios };
+    await this.doctor.saveAll(doctores);
+    console.log(chalk.bgGreen.white("Doctor actualizado exitosamente"));
+    await Helper.esperar();
+  }
+
+  // NUEVO AGREGADO
+  async delete() {
+    const doctores = await this.doctor.load();
+    if (!doctores.length) {
+      console.log(chalk.bgRed.white("No hay doctores."));
+      await Helper.esperar();
+      return;
+    }
+    const { idx } = await inquirer.prompt([{
+      type: "select", name: "idx", message: "Seleccione doctor a eliminar",
+      choices: doctores.map((d, i) => ({ name: `${d.nombre} ${d.apellido} - ${d.especialidad}`, value: i })),
+    }]);
+    const { ok } = await inquirer.prompt([{ type: "confirm", name: "ok", message: `¿Eliminar a ${doctores[idx].nombre} ${doctores[idx].apellido}?`, default: false }]);
+    if (ok) {
+      doctores.splice(idx, 1);
+      await this.doctor.saveAll(doctores);
+      console.log(chalk.bgGreen.white("Doctor eliminado exitosamente"));
+    } else {
+      console.log(chalk.bgYellow.white("Operación cancelada"));
+    }
+    await Helper.esperar();
+  }
+  //-----------------------------------------------------//
 
   async validateDoctor(nombre, apellido, edad, sexo) {
     const doctores = await this.doctor.load();

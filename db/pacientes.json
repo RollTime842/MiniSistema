@@ -2,14 +2,14 @@
   {
     "table": "pacientes",
     "id": 1782489903804,
-    "nombre": "ygfd",
-    "apellido": "kjhg",
-    "edad": "77",
-    "sexo": "M",
+    "nombre": "lin",
+    "apellido": "lin",
+    "edad": "32",
+    "sexo": "F",
     "vacuna": {
       "table": "vacunas",
       "id": 1782488827160,
-      "nombre": "tt"
+      "nombre": "tetanok"
     }
   }
 ]

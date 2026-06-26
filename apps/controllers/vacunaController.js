@@ -17,6 +17,17 @@ export default class VacunaController {
     {
       name: "Crear Vacuna",
       value: 2,
+      
+    },
+  // NUEVO AGREGADO
+    {
+      name: "Actualizar Vacuna",
+      value: 3,
+    },
+    // NUEVO AGREGADO
+    {
+      name: "Eliminar Vacuna",
+      value: 4,
     },
   ];
   constructor(opcion) {
@@ -31,6 +42,12 @@ export default class VacunaController {
       await this.read();
     } else if (opcion == 2) {
       await this.create();
+       // NUEVO AGREGADO
+    } else if (opcion == 3) {
+      await this.update();
+    // NUEVO AGREGADO
+    } else if (opcion == 4) {
+      await this.delete();
     } else {
       console.log(chalk.bgRed.white("Opción no válida"));
     }
@@ -92,10 +109,51 @@ export default class VacunaController {
     await Helper.esperar();
   }
 
-  async update() {}
 
+  // NUEVO AGREGADO
+  async update() {
+    const vacunas = await this.vacuna.load();
+    if (!vacunas.length) {
+      console.log(chalk.bgRed.white("No hay vacunas."));
+      await Helper.esperar();
+      return;
+    }
+    const { idx } = await inquirer.prompt([{
+      type: "select", name: "idx", message: "Seleccione vacuna a actualizar",
+      choices: vacunas.map((v, i) => ({ name: v.nombre, value: i })),
+    }]);
+    const v = vacunas[idx];
+    const cambios = await inquirer.prompt([
+      { type: "input", name: "nombre", message: "Nombre", default: v.nombre, validate: inp => inp.trim() ? true : "Req" },
+    ]);
+    vacunas[idx] = { ...v, ...cambios };
+    await this.vacuna.saveAll(vacunas);
+    console.log(chalk.bgGreen.white("Vacuna actualizada exitosamente"));
+    await Helper.esperar();
+  }
 
-  async delete() {}
+  // NUEVO AGREGADO
+  async delete() {
+    const vacunas = await this.vacuna.load();
+    if (!vacunas.length) {
+      console.log(chalk.bgRed.white("No hay vacunas."));
+      await Helper.esperar();
+      return;
+    }
+    const { idx } = await inquirer.prompt([{
+      type: "select", name: "idx", message: "Seleccione vacuna a eliminar",
+      choices: vacunas.map((v, i) => ({ name: v.nombre, value: i })),
+    }]);
+    const { ok } = await inquirer.prompt([{ type: "confirm", name: "ok", message: `¿Eliminar "${vacunas[idx].nombre}"?`, default: false }]);
+    if (ok) {
+      vacunas.splice(idx, 1);
+      await this.vacuna.saveAll(vacunas);
+      console.log(chalk.bgGreen.white("Vacuna eliminada exitosamente"));
+    } else {
+      console.log(chalk.bgYellow.white("Operación cancelada"));
+    }
+    await Helper.esperar();
+  }
 
   async validateVacuna(nombre) {
     const vacunas = await this.vacuna.load();
